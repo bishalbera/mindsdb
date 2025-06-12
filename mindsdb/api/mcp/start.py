@@ -122,7 +122,7 @@ def update_ticket_to_new_flight(
         raise ValueError("No passenger ID given.")
 
      sql_query_1 = f"""
-    SELECT scheduled_departure FROM flights WHERE flight_id = {new_flight_id}
+    SELECT scheduled_departure FROM mindsdb.redshift_datasource.flights WHERE flight_id = {new_flight_id}
     """
      new_flight_data = query(sql_query_1)
      if not new_flight_data:
@@ -141,14 +141,14 @@ def update_ticket_to_new_flight(
         return f"Not permitted to reschedule to a flight within 3 hours. Selected flight is at {departure_time}."
 
      check_ticket_query = f"""
-     SELECT ticket_no FROM tickets WHERE ticket_no = {ticket_no} AND passenger_id = '{passenger_id}'
+     SELECT ticket_no FROM mindsdb.redshift_datasource.tickets WHERE ticket_no = {ticket_no} AND passenger_id = '{passenger_id}'
      """
      ticket_check = query(check_ticket_query)
      if not ticket_check:
         return f"Current signed-in passenger with ID {passenger_id} is not the owner of ticket {ticket_no}."
 
      update_query = f"""
-     UPDATE ticket_flights SET flight_id = {new_flight_id} WHERE ticket_no = {ticket_no}
+     UPDATE mindsdb.redshift_datasource.ticket_flights SET flight_id = {new_flight_id} WHERE ticket_no = {ticket_no}
      """
      response = query(update_query)
      return "Ticket successfully updated to new flight." if response else "Failed to update ticket."
@@ -160,14 +160,14 @@ def cancel_ticket(ticket_no: str, passenger_id) -> str:
         raise ValueError("No passenger ID given.")
 
      check_ticket_query = f"""
-     SELECT ticket_no FROM tickets WHERE ticket_no = {ticket_no} AND passenger_id = '{passenger_id}'
+     SELECT ticket_no FROM mindsdb.redshift_datasource.tickets WHERE ticket_no = {ticket_no} AND passenger_id = '{passenger_id}'
      """
      ticket_check = query(check_ticket_query)
      if not ticket_check:
         return f"Current signed-in passenger with ID {passenger_id} is not the owner of ticket {ticket_no}."
 
      delete_flight_query = f"""
-     DELETE FROM ticket_flights WHERE ticket_no = {ticket_no}
+     DELETE FROM mindsdb.redshift_datasource.ticket_flights WHERE ticket_no = {ticket_no}
      """
      delete_resp = query(delete_flight_query)
      return "Ticket successfully cancelled." if delete_resp else "Failed to cancel the ticket."
@@ -211,7 +211,7 @@ def search_car_rentals(
 
     where_clause = " AND ".join(conditions)
     
-    sql_query = f"SELECT * FROM redshift_datasource.car_rentals"
+    sql_query = f"SELECT * FROM mindsdb.redshift_datasource.car_rentals"
     if where_clause:
         sql_query += f" WHERE {where_clause}"
 
@@ -228,7 +228,7 @@ def book_car_rental(rental_id: int)->str:
     """
 
     sql_query = f"""
-    UPDATE redshift_datasource.car_rentals SET booked = 1 WHERE id = {rental_id}
+    UPDATE mindsdb.redshift_datasource.car_rentals SET booked = 1 WHERE id = {rental_id}
     """
     res = query(sql_query)
     return f"Car rental {rental_id} successfully booked." if res else f"No car rental found with ID {rental_id}"
@@ -259,7 +259,7 @@ def update_car_rental(
         return "No update parameters provided."
 
     sql_query = f"""
-    UPDATE redshift_datasource.car_rentals SET {', '.join(updates)} WHERE id = {rental_id}
+    UPDATE mindsdb.redshift_datasource.car_rentals SET {', '.join(updates)} WHERE id = {rental_id}
     """
 
     res = query(sql_query)
@@ -277,7 +277,7 @@ def cancel_car_rentals(rental_id: int)-> str:
     """
 
     sql_query = f"""
-    UPDATE redshift_datasource.car_rentals SET booked = 0 WHERE id {rental_id}
+    UPDATE mindsdb.redshift_datasource.car_rentals SET booked = 0 WHERE id {rental_id}
     """
     res = query(sql_query)
     return f"Car rental {rental_id} successfully cancelled." if res else f"No car rental found with ID {rental_id}"
@@ -321,7 +321,7 @@ def search_hotels(
 
     where_clause = " AND ".join(conditions)
     
-    sql_query = f"SELECT * FROM redshift_datasource.hotels"
+    sql_query = f"SELECT * FROM mindsdb.redshift_datasource.hotels"
     if where_clause:
         sql_query += f" WHERE {where_clause}"
 
@@ -341,7 +341,7 @@ def book_hotel(hotel_id: int) -> str:
     """
 
     sql_query = f"""
-    UPDATE redshift_datasource.hotels SET booked = 1 WHERE id = {hotel_id}
+    UPDATE mindsdb.redshift_datasource.hotels SET booked = 1 WHERE id = {hotel_id}
     """
 
     res = query(sql_query)
@@ -377,7 +377,7 @@ def update_hotel(
         return "No update parameters provided."
 
     sql_query = f"""
-    UPDATE redshift_datasource.hotels SET {', '.join(conditions)} WHERE id = {hotel_id}
+    UPDATE mindsdb.redshift_datasource.hotels SET {', '.join(conditions)} WHERE id = {hotel_id}
     """
     res = query(sql_query)
     return f"Hotel {hotel_id} successfully booked." if res else f"No hotel found with ID {hotel_id}"
@@ -396,7 +396,7 @@ def cancel_hotel(hotel_id: int) -> str:
     """
     
     sql_query = f"""
-    UPDATE redshift_datasource.hotels SET booked = 0 WHERE id = {hotel_id}
+    UPDATE mindsdb.redshift_datasource.hotels SET booked = 0 WHERE id = {hotel_id}
     """
 
     res = query(sql_query)
@@ -431,7 +431,7 @@ def search_trip_recommendations(
         conditions.append(f"keywords = '{keywords}'")
 
     where_clause = " AND ".join(conditions)
-    sql_query = f"SELECT * FROM redshift_datasource.trip_recommendations"
+    sql_query = f"SELECT * FROM mindsdb.redshift_datasource.trip_recommendations"
     if where_clause:
         sql_query += f" WHERE {where_clause}"
 
@@ -451,7 +451,7 @@ def book_excursion(recommendation_id: int) -> str:
     """
 
     sql_query = f"""
-    UPDATE redshift_datasource.trip_recommendations SET booked = 1 WHERE id = {recommendation_id}
+    UPDATE mindsdb.redshift_datasource.trip_recommendations SET booked = 1 WHERE id = {recommendation_id}
     """
 
     res = query(sql_query)
@@ -472,7 +472,7 @@ def cancel_excursion(recommendation_id: int) -> str:
     """
 
     sql_query = f"""
-    UPDATE redshift_datasource.trip_recommendations SET booked = 0 WHERE id = {recommendation_id}
+    UPDATE mindsdb.redshift_datasource.trip_recommendations SET booked = 0 WHERE id = {recommendation_id}
     """
 
     res = query(sql_query)
